@@ -1,0 +1,134 @@
+import math
+import pygame
+import sys
+from pygame.locals import *
+pygame.init()
+screen = pygame.display.set_mode((600, 500))
+pygame.display.set_caption("The Pie Game - Press 1,2,3,4")
+myfont = pygame.font.Font(None, 60)
+
+color = 200, 80, 60
+width = 4
+x = 300
+y = 250
+radius = 200
+position = x-radius, y-radius, radius*2, radius*2
+start_point = (x, y)
+
+piece1 = False  # 饼1
+piece2 = False  # 饼2
+piece3 = False  # 饼3
+piece4 = False  # 饼4
+key1 = False  # SPACE
+key2 = False  # BACKSPACE
+list_1 = list()  # 记录历史操作
+i = 0  # 记录历史操作次数
+
+# 画饼
+
+
+def darwpie(
+    piece,
+    screen,
+    color,
+    position,
+    start_angle,
+    end_angle,
+    width,
+    start_point,
+    end_point1,
+    end_point2
+):
+    if piece:
+        Start_angle = math.radians(start_angle)
+        End_angle = math.radians(end_angle)
+        pygame.draw.arc(screen, color, position, Start_angle, End_angle, width)
+        pygame.draw.line(screen, color, start_point, end_point1, width)
+        pygame.draw.line(screen, color, start_point, end_point2, width)
+
+
+while True:
+    # 获取键盘信息
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            sys.exit()
+        elif event.type == KEYUP:
+            if event.key == pygame.K_ESCAPE:
+                sys.exit()
+            elif event.key == pygame.K_1:
+                piece1 = True
+                list_1.append(1)
+                i += 1
+            elif event.key == pygame.K_2:
+                piece2 = True
+                list_1.append(2)
+                i += 1
+            elif event.key == pygame.K_3:
+                piece3 = True
+                list_1.append(3)
+                i += 1
+            elif event.key == pygame.K_4:
+                piece4 = True
+                list_1.append(4)
+                i += 1
+            elif event.key == pygame.K_SPACE:
+                key1 = True
+            elif event.key == pygame.K_BACKSPACE:
+                key2 = True
+
+    # 清屏
+    screen.fill((86, 12, 200))
+
+    # 写数字
+    textimg1 = myfont.render("1", True, color)
+    screen.blit(textimg1, (x+radius/2-20, y-radius/2))
+    textimg2 = myfont.render("2", True, color)
+    screen.blit(textimg2, (x-radius/2, y-radius/2))
+    textimg3 = myfont.render("3", True, color)
+    screen.blit(textimg3, (x-radius/2, y+radius/2-20))
+    textimg4 = myfont.render("4", True, color)
+    screen.blit(textimg4, (x+radius/2-20, y+radius/2-20))
+
+    # 画饼
+    darwpie(piece1, screen, color, position, 0, 90, width,
+            start_point, (x, y-radius),  (x+radius, y))
+    darwpie(piece2, screen, color, position, 90, 180, width,
+            start_point, (x, y-radius), (x-radius, y))
+    darwpie(piece3, screen, color, position, 180, 270,
+            width, start_point, (x-radius, y), (x, y+radius))
+    darwpie(piece4, screen, color, position, 270, 360,
+            width, start_point, (x, y+radius), (x+radius, y))
+
+    # 检查饼是否画完
+    if piece1 and piece2 and piece3 and piece4:
+        color = 0, 255, 0
+
+    # 刷新画饼进度
+    if key1:
+        piece1 = False
+        piece2 = False
+        piece3 = False
+        piece4 = False
+        color = 200, 80, 60
+        key1 = False
+        i = 0
+
+    # 返回一步
+    if key2:
+        if i == 0:
+            sys.exit()
+        i -= 1
+        piece = list_1.pop(i)
+        if piece == 1:
+            piece1 = False
+        if piece == 2:
+            piece2 = False
+        if piece == 3:
+            piece3 = False
+        if piece == 4:
+            piece4 = False
+        color = 200, 80, 60
+        key2 = False
+        piece = 0
+
+    pygame.display.update()
